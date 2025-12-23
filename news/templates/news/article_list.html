@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>AI News Curator</title>
-    <style>
+    <head>
+        <title>AI News Curator</title>
+        <style>
         body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
         .article { border-bottom: 1px solid #eee; padding: 10px 0; }
         a { color: #007bff; text-decoration: none; font-size: 1.2em; }
         a:hover { text-decoration: underline; }
         .date { color: #666; font-size: 0.8em; }
-    </style>
-</head>
-<body>
-    <h1>Latest News</h1>
-    {% for article in articles %}
-        <div class="article">
-            <a href="{{ article.url }}" target="_blank">{{ article.title }}</a>
-            <p class="date">Found on: {{ article.created_at|date:"F j, Y, g:i a" }}</p>
-        </div>
-    {% empty %}
-        <p>No articles found. Run "python manage.py fetch_news" to get some!</p>
-    {% endfor %}
-</body>
+        </style>
+    </head>
+    <body>
+        <h1>Latest News</h1>
+        {% for article in articles %}
+            <div class="article">
+                <a href="{{ article.url }}" target="_blank">{{ article.title }}</a>
+                <p class="category">Category: {{ article.category }}</p>
+                <p class="source">Source: {{ article.source }}</p>
+                <p class="published_at">Found on: {{ article.published_at|date:"F j, Y, g:i a" }}</p>
+            </div>
+        {% empty %}
+            <p>No articles found. Run "python manage.py fetch_news" to get some!</p>
+        {% endfor %}
+    </body>
 </html>
