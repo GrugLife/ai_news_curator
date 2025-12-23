@@ -1,40 +1,37 @@
-import requests
+import os
+from dotenv import load_dotenv
+from massive import RESTClient
+from massive.rest.models import (
+    TickerNews,
+)
+
+load_dotenv()
 
 
-def fetch_alpha_vantage_news():
-    # ... your API request logic ...
-    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=AAPL&apikey={"ALPHAVANTAGE_API_KEY"}'
-    r = requests.get(url)
-    data = r.json()
-
-    # 1. Access the 'feed' list
-    articles_data = data.get("feed", [])
-
+def fetch_massive_news():
+    client = RESTClient(os.getenv("MASSIVE_API_KEY"))
     articles = []
-    for item in articles_data:
-        # 2. Parse the special Alpha Vantage date format: YYYYMMDDTHHMMSS
-        # Example: 20251222T222153
-        topics = item.get("topics", [])
-        if topics:
-            category = topics[0].get("topic").replace("_", " ").title()
-        else:
-            category = "Finance"
+    iterator = client.list_ticker_news(order="desc", limit=50, sort="published_utc")
+    for index, item in enumerate(iterator):
+        if index >= 50:
+            break
 
-        articles.append(
-            {
-                "title": item.get("title"),
-                "url": item.get("url"),
-                "summary": item.get("summary"),
-                "source": item.get("source"),
-                "published_at": item.get("time_published"),
-                "category": category,  # You could also pull from the 'topics' list
-            }
-        )
+        if isinstance(item, TickerNews):
+            # --- GET FIRST KEYWORD AS CATEGORY ---
+            # item.keywords is a list. We use .get() and check if it has items.
+            raw_keywords = getattr(item, "keywords", [])
+            if raw_keywords and len(raw_keywords) > 0:
+                category = raw_keywords[0].title()
+            else:
+                category = "Finance"
+
+            articles.append(
+                {
+                    "title": item.title,
+                    "url": item.article_url,
+                    "source": item.publisher.name,
+                    "published_at": item.published_utc,
+                    "category": category,
+                }
+            )
     return articles
-
-
-yfinance_news = fetch_alpha_vantage_news()
-for item in yfinance_news:
-    print(
-        f"Title: {item['title']}\nLink: {item['url']}\nCategory: {item['category']}\nSource: {item['source']}\n Date: {item['published_at']}\n"
-    )

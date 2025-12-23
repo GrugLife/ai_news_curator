@@ -4,6 +4,7 @@ from news.scraper import (
     fetch_finnhub,
     fetch_yfinance_news,
     fetch_alpha_vantage_news,
+    fetch_massive_news,
 )  # Assuming scraper.py is in the news folder
 
 
@@ -16,6 +17,7 @@ class Command(BaseCommand):
             ("finnhub", fetch_finnhub),
             ("yahoo finance", fetch_yfinance_news),
             ("alphavantage", fetch_alpha_vantage_news),
+            ("massive", fetch_massive_news),
         ]
 
         count = 0

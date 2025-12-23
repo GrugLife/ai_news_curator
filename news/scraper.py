@@ -4,6 +4,10 @@ import finnhub
 import yfinance as yf
 from datetime import datetime
 from dotenv import load_dotenv
+from massive import RESTClient
+from massive.rest.models import (
+    TickerNews,
+)
 
 load_dotenv()
 
@@ -50,7 +54,7 @@ def fetch_yfinance_news():
 
 def fetch_alpha_vantage_news():
     # ... your API request logic ...
-    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=AAPL&apikey={"ALPHAVANTAGE_API_KEY"}'
+    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={"ALPHAVANTAGE_API_KEY"}'
     r = requests.get(url)
     data = r.json()
 
@@ -80,6 +84,35 @@ def fetch_alpha_vantage_news():
     return articles
 
 
+def fetch_massive_news():
+    client = RESTClient(os.getenv("MASSIVE_API_KEY"))
+    articles = []
+    iterator = client.list_ticker_news(order="desc", limit=50, sort="published_utc")
+    for index, item in enumerate(iterator):
+        if index >= 50:
+            break
+
+        if isinstance(item, TickerNews):
+            # --- GET FIRST KEYWORD AS CATEGORY ---
+            # item.keywords is a list. We use .get() and check if it has items.
+            raw_keywords = getattr(item, "keywords", [])
+            if raw_keywords and len(raw_keywords) > 0:
+                category = raw_keywords[0].title()
+            else:
+                category = "Finance"
+
+            articles.append(
+                {
+                    "title": item.title,
+                    "url": item.article_url,
+                    "source": item.publisher.name,
+                    "published_at": item.published_utc,
+                    "category": category,
+                }
+            )
+    return articles
+
+
 # To test it, run: python news/scraper.py
 if __name__ == "__main__":
     fin_news = fetch_finnhub()
@@ -96,6 +129,12 @@ if __name__ == "__main__":
 
     av_news = fetch_alpha_vantage_news()
     for item in av_news:
+        print(
+            f"Title: {item['title']}\nLink: {item['url']}\nCategory: {item['category']}\nSource: {item['source']}\n Date: {item['published_at']}\n"
+        )
+
+    massive_news = fetch_massive_news()
+    for item in massive_news:
         print(
             f"Title: {item['title']}\nLink: {item['url']}\nCategory: {item['category']}\nSource: {item['source']}\n Date: {item['published_at']}\n"
         )

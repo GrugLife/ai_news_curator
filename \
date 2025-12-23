@@ -1,0 +1,30 @@
+import os
+from dotenv import load_dotenv
+from massive import RESTClient
+from massive.rest.models import (
+    TickerNews,
+)
+
+load_dotenv()
+
+client = RESTClient(os.getenv("MASSIVE_API_KEY"))
+news_iterator = client.list_ticker_news(
+    order="desc",
+    limit=50,
+    sort="published_utc",
+)
+
+print(f"{'Published Date':<25}{'Headline':<15}")
+print("-" * 50)
+# print(news)
+
+# print date + title
+for index, item in enumerate(news_iterator):
+    # verify this is an agg
+    if index >= 20:
+        break
+
+    if isinstance(item, TickerNews):
+        print("{:<25}{:<15}".format(item.published_utc, item.title))
+
+print(f"\nSuccessfully processed {index} articles.")
