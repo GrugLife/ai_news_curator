@@ -3,7 +3,7 @@ import requests
 
 def fetch_alpha_vantage_news():
     # ... your API request logic ...
-    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={"ALPHAVANTAGE_API_KEY"}'
+    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=AAPL&apikey={"ALPHAVANTAGE_API_KEY"}'
     r = requests.get(url)
     data = r.json()
 

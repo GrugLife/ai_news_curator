@@ -3,6 +3,7 @@ from news.models import Article
 from news.scraper import (
     fetch_finnhub,
     fetch_yfinance_news,
+    fetch_alpha_vantage_news,
 )  # Assuming scraper.py is in the news folder
 
 
@@ -11,7 +12,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # 1 define th scrapers
-        scrapers = [("finnhib", fetch_finnhub), ("yahoo finance", fetch_yfinance_news)]
+        scrapers = [
+            ("finnhub", fetch_finnhub),
+            ("yahoo finance", fetch_yfinance_news),
+            ("alphavantage", fetch_alpha_vantage_news),
+        ]
 
         count = 0
         for website, scraper_func in scrapers:

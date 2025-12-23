@@ -6,7 +6,6 @@ from django.utils import timezone
 class Article(models.Model):
     title = models.CharField(max_length=500)
     url = models.URLField(unique=True)
-    # Remove 'choices' and use a simple CharField
     category = models.CharField(max_length=100, default="General")
     source = models.CharField(max_length=100, default="Unknown")
     summary = models.TextField(blank=True, null=True)
